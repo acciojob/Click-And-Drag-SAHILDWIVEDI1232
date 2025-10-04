@@ -1,29 +1,29 @@
-const items = document.querySelector('.items');
-let isDragging = false;
+const container = document.querySelector('.items');
+let isDown = false;
 let startX;
 let scrollLeft;
 
-items.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.pageX - items.offsetLeft;
-    scrollLeft = items.scrollLeft;
-    items.classList.add('active'); // optional
+container.addEventListener('mousedown', (e) => {
+  isDown = true;
+  container.classList.add('active'); // Optional styling
+  startX = e.pageX - container.offsetLeft;
+  scrollLeft = container.scrollLeft;
 });
 
-items.addEventListener('mouseleave', () => {
-    isDragging = false;
-    items.classList.remove('active');
+container.addEventListener('mouseleave', () => {
+  isDown = false;
+  container.classList.remove('active');
 });
 
-items.addEventListener('mouseup', () => {
-    isDragging = false;
-    items.classList.remove('active');
+container.addEventListener('mouseup', () => {
+  isDown = false;
+  container.classList.remove('active');
 });
 
-items.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - items.offsetLeft;
-    const walk = (x - startX) * 1; // scroll-fast factor
-    items.scrollLeft = scrollLeft - walk;
+container.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - container.offsetLeft;
+  const walk = x - startX;
+  container.scrollLeft = scrollLeft - walk;
 });
