@@ -1,27 +1,28 @@
 const container = document.querySelector('.items');
-let isDown = false;
+
+let isDragging = false;
 let startX;
 let scrollLeft;
 
 container.addEventListener('mousedown', (e) => {
-  isDown = true;
-  container.classList.add('active'); // Optional styling
+  isDragging = true;
+  container.classList.add('dragging'); // Optional: add a class while dragging
   startX = e.pageX - container.offsetLeft;
   scrollLeft = container.scrollLeft;
 });
 
 container.addEventListener('mouseleave', () => {
-  isDown = false;
-  container.classList.remove('active');
+  isDragging = false;
+  container.classList.remove('dragging');
 });
 
 container.addEventListener('mouseup', () => {
-  isDown = false;
-  container.classList.remove('active');
+  isDragging = false;
+  container.classList.remove('dragging');
 });
 
 container.addEventListener('mousemove', (e) => {
-  if (!isDown) return;
+  if (!isDragging) return;
   e.preventDefault();
   const x = e.pageX - container.offsetLeft;
   const walk = x - startX;
