@@ -1,30 +1,29 @@
-// Your code here.
+const items = document.querySelector('.items');
 let isDragging = false;
-let offsetX, offsetY;
+let startX;
+let scrollLeft;
 
-const items = document.querySelectorAll('.item');
+items.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.pageX - items.offsetLeft;
+    scrollLeft = items.scrollLeft;
+    items.classList.add('active'); // optional
+});
 
-items.forEach(item => {
-    item.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        offsetX = e.clientX - item.getBoundingClientRect().left;
-        offsetY = e.clientY - item.getBoundingClientRect().top;
-        item.classList.add('active'); // Optional: add a class to indicate dragging
-    });
+items.addEventListener('mouseleave', () => {
+    isDragging = false;
+    items.classList.remove('active');
+});
 
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const newX = e.clientX - offsetX;
-            const newY = e.clientY - offsetY;
+items.addEventListener('mouseup', () => {
+    isDragging = false;
+    items.classList.remove('active');
+});
 
-            // Optional: Add boundary checks here if needed
-
-            item.style.transform = `translate(${newX}px, ${newY}px)`;
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        item.classList.remove('active'); // Remove the class when done
-    });
+items.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - items.offsetLeft;
+    const walk = (x - startX) * 1; // scroll-fast factor
+    items.scrollLeft = scrollLeft - walk;
 });
