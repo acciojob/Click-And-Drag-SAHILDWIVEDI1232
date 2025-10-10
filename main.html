@@ -1,19 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Draggable Cubes</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      border: 2px solid #000;
+      background-color: #fff;
+    }
+
+    .cube {
+      width: 50px;
+      height: 50px;
+      background-color: #3498db;
+      position: absolute;
+      cursor: grab;
+      border-radius: 5px;
+      user-select: none;
+    }
+
+    .cube.dragging {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body>
-  <div class="items" id="container">
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
-    <div class="cube"></div>
+
+  <div class="container">
+    <div class="cube" style="left: 0px; top: 0px;"></div>
+    <div class="cube" style="left: 60px; top: 0px;"></div>
+    <div class="cube" style="left: 0px; top: 60px;"></div>
+    <div class="cube" style="left: 60px; top: 60px;"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const cubes = document.querySelectorAll('.cube');
+    const container = document.querySelector('.container');
+
+    let selectedCube = null;
+    let offsetX, offsetY;
+
+    cubes.forEach(cube => {
+      cube.addEventListener('mousedown', (e) => {
+        selectedCube = cube;
+        offsetX = e.clientX - cube.getBoundingClientRect().left;
+        offsetY = e.clientY - cube.getBoundingClientRect().top;
+        cube.classList.add('dragging');
+
+        // Add listeners to document
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+      });
+    });
+
+    function mouseMoveHandler(e) {
+      if (!selectedCube) return;
+
+      const containerRect = container.getBoundingClientRect();
+
+      let newX = e.clientX - containerRect.left - offsetX;
+      let newY = e.clientY - containerRect.top - offsetY;
+
+      // Clamp positions to container boundaries
+      const maxX = container.clientWidth - selectedCube.offsetWidth;
+      const maxY = container.clientHeight - selectedCube.offsetHeight;
+
+      newX = Math.max(0, Math.min(newX, maxX));
+      newY = Math.max(0, Math.min(newY, maxY));
+
+      selectedCube.style.left = `${newX}px`;
+      selectedCube.style.top = `${newY}px`;
+    }
+
+    function mouseUpHandler() {
+      if (selectedCube) {
+        selectedCube.classList.remove('dragging');
+        selectedCube = null;
+      }
+
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    }
+  </script>
+
 </body>
 </html>
