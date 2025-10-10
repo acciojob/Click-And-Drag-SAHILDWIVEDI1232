@@ -4,10 +4,6 @@
   <meta charset="UTF-8">
   <title>Draggable Cubes</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       display: flex;
       justify-content: center;
@@ -44,7 +40,7 @@
 <body>
 
   <div class="container">
-    <div class="cube" style="left: 0px; top: 0px;"></div>
+    <div class="cube" id="cube1" style="left: 0px; top: 0px;"></div>
     <div class="cube" style="left: 60px; top: 0px;"></div>
     <div class="cube" style="left: 0px; top: 60px;"></div>
     <div class="cube" style="left: 60px; top: 60px;"></div>
@@ -64,7 +60,6 @@
         offsetY = e.clientY - cube.getBoundingClientRect().top;
         cube.classList.add('dragging');
 
-        // Add listeners to document
         document.addEventListener('mousemove', mouseMoveHandler);
         document.addEventListener('mouseup', mouseUpHandler);
       });
@@ -78,7 +73,6 @@
       let newX = e.clientX - containerRect.left - offsetX;
       let newY = e.clientY - containerRect.top - offsetY;
 
-      // Clamp positions to container boundaries
       const maxX = container.clientWidth - selectedCube.offsetWidth;
       const maxY = container.clientHeight - selectedCube.offsetHeight;
 
