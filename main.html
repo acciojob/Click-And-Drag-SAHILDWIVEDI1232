@@ -1,97 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Draggable Cubes</title>
+  <meta charset="UTF-8" />
+  <title>Scrollable Items</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
+      background: #f0f0f0;
     }
 
-    .container {
+    .items {
       width: 400px;
-      height: 400px;
-      position: relative;
+      height: 120px;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      white-space: nowrap;
       border: 2px solid #000;
       background-color: #fff;
-    }
-
-    .cube {
-      width: 50px;
-      height: 50px;
-      background-color: #3498db;
-      position: absolute;
       cursor: grab;
-      border-radius: 5px;
-      user-select: none;
     }
 
-    .cube.dragging {
-      cursor: grabbing;
-      opacity: 0.7;
+    .item {
+      display: inline-block;
+      width: 200px;
+      height: 100px;
+      margin: 10px;
+      background-color: #3498db;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="cube" id="cube1" style="left: 0px; top: 0px;"></div>
-    <div class="cube" style="left: 60px; top: 0px;"></div>
-    <div class="cube" style="left: 0px; top: 60px;"></div>
-    <div class="cube" style="left: 60px; top: 60px;"></div>
+  <div class="items">
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
+    <div class="item"></div>
   </div>
 
   <script>
-    const cubes = document.querySelectorAll('.cube');
-    const container = document.querySelector('.container');
+    const container = document.querySelector('.items');
 
-    let selectedCube = null;
-    let offsetX, offsetY;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-    cubes.forEach(cube => {
-      cube.addEventListener('mousedown', (e) => {
-        selectedCube = cube;
-        offsetX = e.clientX - cube.getBoundingClientRect().left;
-        offsetY = e.clientY - cube.getBoundingClientRect().top;
-        cube.classList.add('dragging');
-
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-      });
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.classList.add('active');
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
     });
 
-    function mouseMoveHandler(e) {
-      if (!selectedCube) return;
+    container.addEventListener('mouseleave', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
 
-      const containerRect = container.getBoundingClientRect();
+    container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.classList.remove('active');
+    });
 
-      let newX = e.clientX - containerRect.left - offsetX;
-      let newY = e.clientY - containerRect.top - offsetY;
-
-      const maxX = container.clientWidth - selectedCube.offsetWidth;
-      const maxY = container.clientHeight - selectedCube.offsetHeight;
-
-      newX = Math.max(0, Math.min(newX, maxX));
-      newY = Math.max(0, Math.min(newY, maxY));
-
-      selectedCube.style.left = `${newX}px`;
-      selectedCube.style.top = `${newY}px`;
-    }
-
-    function mouseUpHandler() {
-      if (selectedCube) {
-        selectedCube.classList.remove('dragging');
-        selectedCube = null;
-      }
-
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-    }
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5; // scroll speed
+      container.scrollLeft = scrollLeft - walk;
+    });
   </script>
 
 </body>
