@@ -1,62 +1,44 @@
-
-const container = document.getElementById('container');
 const cubes = document.querySelectorAll('.cube');
+const container = document.getElementById('container');
 
-const containerRect = container.getBoundingClientRect();
-
-// Arrange cubes in a grid initially
-let gridPositions = [
-  { x: 10, y: 10 },
-  { x: 100, y: 10 },
-  { x: 10, y: 100 },
-  { x: 100, y: 100 },
-];
-
-cubes.forEach((cube, index) => {
-  let { x, y } = gridPositions[index % gridPositions.length];
-  cube.style.left = x + 'px';
-  cube.style.top = y + 'px';
-});
-
-let selectedCube = null;
-let offsetX = 0;
-let offsetY = 0;
+let currentCube = null;
+let offsetX, offsetY;
 
 cubes.forEach(cube => {
-  cube.addEventListener('mousedown', (e) => {
-    selectedCube = cube;
-    selectedCube.classList.add('dragging');
+    cube.addEventListener('mousedown', (e) => {
+        currentCube = cube;
+        offsetX = e.clientX - cube.getBoundingClientRect().left;
+        offsetY = e.clientY - cube.getBoundingClientRect().top;
+        cube.classList.add('dragging');
 
-    const cubeRect = cube.getBoundingClientRect();
-    offsetX = e.clientX - cubeRect.left;
-    offsetY = e.clientY - cubeRect.top;
-
-    // Bring cube to front
-    selectedCube.style.zIndex = 1000;
-  });
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    });
 });
 
-document.addEventListener('mousemove', (e) => {
-  if (!selectedCube) return;
+function mouseMoveHandler(e) {
+    if (!currentCube) return;
 
-  let x = e.clientX - containerRect.left - offsetX;
-  let y = e.clientY - containerRect.top - offsetY;
+    let newX = e.clientX - offsetX;
+    let newY = e.clientY - offsetY;
 
-  // Constrain within container
-  const maxX = container.clientWidth - selectedCube.offsetWidth;
-  const maxY = container.clientHeight - selectedCube.offsetHeight;
+    // Boundary checking
+    const containerRect = container.getBoundingClientRect();
+    const cubeRect = currentCube.getBoundingClientRect();
 
-  x = Math.max(0, Math.min(x, maxX));
-  y = Math.max(0, Math.min(y, maxY));
+    if (newX < containerRect.left) newX = containerRect.left;
+    if (newX + cubeRect.width > containerRect.right) newX = containerRect.right - cubeRect.width;
+    if (newY < containerRect.top) newY = containerRect.top;
+    if (newY + cubeRect.height > containerRect.bottom) newY = containerRect.bottom - cubeRect.height;
 
-  selectedCube.style.left = x + 'px';
-  selectedCube.style.top = y + 'px';
-});
+    currentCube.style.transform = `translate(${newX}px, ${newY}px)`;
+}
 
-document.addEventListener('mouseup', () => {
-  if (selectedCube) {
-    selectedCube.classList.remove('dragging');
-    selectedCube.style.zIndex = '';
-    selectedCube = null;
-  }
-});
+function mouseUpHandler() {
+    if (currentCube) {
+        currentCube.classList.remove('dragging');
+        currentCube = null;
+    }
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+}
